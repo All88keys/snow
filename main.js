@@ -26,12 +26,14 @@ function addVector(obj1,obj2) {
   return {x: obj1.x+obj2.x, y: obj1.y+obj2.y};
 }
 
+//vector constructor
 function vector(x,y) {
   this.x = x;
   this.y = y;
 }
 
 
+//snowflake constructor
 function snowflake(x,y, size) {
   this.pos = new vector(x,y);
   this.vel = new vector(0,.9);
@@ -40,8 +42,12 @@ function snowflake(x,y, size) {
   this.update = function () {
     //calculate gusts
     for (flust of wind) {
-      if((this.pos.x < flust.x+flust.width && this.pos.x > flust.x)&&(this.pos.y < flust.y+flust.height && this.pos.y > flust.y)){
-        this.vel = addVector(this.vel, {x: flust.force.x*this.size/maxSize, y: flust.force.y*this.size/maxSize});
+      //if((this.pos.x < flust.x+flust.width && this.pos.x > flust.x)&&(this.pos.y < flust.y+flust.height && this.pos.y > flust.y)){
+      //  this.vel = addVector(this.vel, {x: flust.force.x*this.size/maxSize, y: flust.force.y*this.size/maxSize});
+      //}
+      var dist = Math.sqrt(Math.pow(flust.x-this.pos.x,2) + Math.pow(flust.y-this.pos.y,2)); // dist from snowflake to center of gust
+      if(dist<flust.r){
+        this.vel = addVector(this.vel, {x: (flust.force.x*this.size/maxSize)*(flust.r-dist)/flust.r, y: (flust.force.y*this.size/maxSize)*(flust.r-dist)/flust.r});
       }
     }
 
@@ -56,17 +62,21 @@ function snowflake(x,y, size) {
 }
 
 
-function gust(x,y,force) { //force is a vector
+function gust(x,y,r,force) { //force is a vector
   this.x = x; //rand(0,c.width-10)
   this.y = y; //rand(0,c.height-10)
-  this.width = rand(60,c.width-this.x)
-  this.height = rand(60,c.height-this.y)
+  //this.width = rand(60,c.width-this.x)
+  //this.height = rand(60,c.height-this.y)
+  this.r = r;
   this.force = force; //new vector(rand(-20,20)/10, rand(-20,20)/10)
   this.life = 200;
   this.update = function () {
     if (dev) {
+      ctx.beginPath();
       ctx.strokeStyle = 'red';
-      ctx.strokeRect(this.x, this.y, this.width, this.height);
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.stroke();
+      //ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
   }
 }
@@ -83,8 +93,10 @@ function loop() {
     }
   }
   if (clock%200 == 0) {
-    wind.push(new gust(rand(-50,c.width-10), rand(0,c.height-10), new vector(rand(-100,100)/3000, rand(-100,100)/8000)));
-    wind.push(new gust(rand(-50,c.width-10), rand(0,c.height-10), new vector(rand(-100,100)/80000, rand(-100,100)/10000)));
+    //wind.push(new gust(rand(-50,c.width-10), rand(0,c.height-10), new vector(rand(-100,100)/3000, rand(-100,100)/8000)));
+    //wind.push(new gust(rand(-50,c.width-10), rand(0,c.height-10), new vector(rand(-100,100)/80000, rand(-100,100)/10000)));
+    wind.push(new gust(rand(-50,c.width-10), rand(0,c.height-10), rand(0,c.width/3), new vector(rand(-100,100)/8000, rand(-100,100)/10000)))
+    wind.push(new gust(rand(-50,c.width-10), rand(0,c.height-10), rand(0,c.width/3), new vector(rand(-100,100)/8000, rand(-100,100)/10000)))
   }
   if (clock%200 == 190) {
     wind.shift();
