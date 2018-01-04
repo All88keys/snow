@@ -92,7 +92,7 @@ function loop() {
   ctx.fillStyle = 'white';
 
   if (clock%1 == 0) {
-    for (var i = 0; i < 1; i++) { //rand(5,10)
+    for (var i = 0; i < rand(5,10); i++) {
       snow.push(new snowflake(rand(-50,c.width+50), -20, rand(1,maxSize*10)/10));
     }
   }
